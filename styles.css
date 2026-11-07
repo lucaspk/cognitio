@@ -3,7 +3,7 @@
   --paper: #faf8f4;
   --paper-2: #f7f3ed;
   --ink: #302e29;
-  --muted: #7e7a72;
+  --muted: #6b675f;
   --line: #d8d2c7;
   --red: #c9201a;
   --rust: #ac4b31;
@@ -251,7 +251,18 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-o
   color: var(--muted);
   margin: 0 0 5px;
 }
-
+.editorial-scope {
+  max-width: 1100px;
+  margin: -18px 0 32px;
+  padding: 14px 18px;
+  border-left: 2px solid var(--rust);
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.editorial-scope p { margin: 0; }
+.editorial-scope p + p { margin-top: 5px; }
 .sr-only {
   position: absolute;
   width: 1px;
@@ -700,6 +711,31 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-o
 .guide-list { padding-left: 18px; color: #5a554f; font-size: 14px; line-height: 1.9; }
 .guide-list li { display: list-item; margin: 6px 0; counter-increment: none; }
 .guide-list li:before { display: none; }
+
+.worked-example {
+  margin: 25px 0 21px;
+  padding: 22px 23px;
+  border-left: 2px solid var(--rust);
+  background: #f5efe5;
+}
+.worked-example p { margin: 15px 0; color: #4d463f; font-size: 13px; line-height: 1.9; }
+.worked-example.is-transfer { border-left-color: #947d62; background: #f7f3eb; }
+.worked-kicker { color: var(--rust); font-size: 10px; font-weight: 700; letter-spacing: .13em; }
+.worked-scene { margin-top: 17px !important; }
+.worked-question { font: 400 16px/1.65 var(--text-serif) !important; }
+.worked-gloss { font-size: 12px !important; }
+.attempt-reminder { margin-top: 6px !important; color: #756d62 !important; font-size: 12px !important; font-style: italic; }
+.worked-answer { margin: 17px 0; padding: 10px 0; border-top: 1px solid #d9cab8; border-bottom: 1px solid #d9cab8; }
+.worked-answer summary { color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; }
+.worked-answer p { margin: 12px 0 3px; color: var(--ink); }
+.guide-intro { margin: 8px 0 23px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+.assessment-list { margin: 12px 0 24px; padding-left: 18px; font-size: 13px; line-height: 1.85; }
+.assessment-list li { margin-bottom: 10px; }
+.domain-blurb { margin: 0 0 19px; color: #575047; font-size: 14px; line-height: 1.75; }
+.app-steps > summary { cursor: pointer; }
+.app-steps .guide-timeline { margin-top: 22px; }
+.worked-answer summary:focus-visible,
+.app-steps summary:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
 
 .measure-grid {
   display: grid;

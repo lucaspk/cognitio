@@ -1,20 +1,17 @@
 'use strict';
-const JSON_URL = './cognitio_capitulos_v2.json';
+const JSON_URL = './cognitio_capitulos_v3.json';
 const TREE = './assets/arvore.webp';
 let DATA = null;
 let state = { query: '', onlyEssential: false, phase: 'todas', exampleArea: 'computacao' };
 
 const el = id => document.getElementById(id);
-const esc = value => String(value ?? '').replace(/[&<>"']/g, c => {
-switch (c) {
-    case '&': return '&';
-    case '<': return '<';
-    case '>': return '>';
-    case '"': return '"';
-    case "'": return '&#39;';
-    default: return c;
-}
-});
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[c]);
 const safeUrl = (v) => { try { let u = new URL(v, location.href); return ['https:', 'http:'].includes(u.protocol) ? u.href : '#'; } catch { return '#'; } };
 const arr = v => Array.isArray(v) ? v : [];
 const p = v => v ? `<p>${esc(v)}</p>` : '';
@@ -72,6 +69,7 @@ function renderIndex() {
   const grouped = arr(DATA.fases).map(f => ({ ...f, found: indexed.filter(x => arr(f.capitulos).includes(x.id)) })).filter(f => f.found.length);
   const prelim = DATA.capitulo_preliminar;
   return `${makeHeader('indice')}<main class="page index-wrap"><div class="index-intro"><h1>Índice</h1></div>
+  <aside class="editorial-scope" aria-label="Escopo editorial"><p>${esc(DATA.apresentacao?.aviso_critico || '')}</p></aside>
   <section class="index-zero" aria-label="Antes de começar"><div class="index-eyebrow">Prólogo · comece por aqui</div><div class="chapter-grid" style="margin-top:18px">${card(prelim, 0, true)}<a class="index-card" href="#/conclusao"><div class="card-head"><span class="card-date">FINAL</span><span class="card-category">SÍNTESE E DECISÃO</span><span class="card-no">↘</span></div><h3 class="card-title">Conclusão</h3><p class="card-descr">${esc(DATA.conclusao?.criterio_de_adocao_pessoal || 'Como decidir se uma técnica vale a pena.')}</p><div class="card-bottom"><span class="arrow-corner">↗</span></div></a></div></section>
   <div class="index-tools" role="search" aria-label="Filtros do índice"><div class="search-control"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5" stroke-linecap="round"/></svg><input id="search" class="field search-field" type="search" value="${esc(state.query)}" aria-label="Buscar no índice" placeholder="Buscar no índice"></div><div class="period-control"><select id="phase" class="field period-field" aria-label="Selecionar período"><option value="todas">Todos os períodos</option>${arr(DATA.fases).map(f => `<option value="${esc(f.id)}" ${state.phase === f.id ? 'selected' : ''}>${esc(f.periodo)} · ${esc(f.titulo)}</option>`).join('')}</select></div><button class="filter-button" id="essential" type="button" role="switch" aria-checked="${state.onlyEssential}" aria-controls="index-results"><span class="switch-track" aria-hidden="true"></span><span>Somente essenciais</span></button><p class="filter-label" id="count" role="status" aria-live="polite" aria-atomic="true">${resultCount(indexed.length, c.length)}</p></div>
   <div id="index-results">${renderIndexGroups(grouped)}</div><p class="index-footnote">As categorias e os recortes históricos são escolhas editoriais; os experimentos pessoais propostos não reproduzem necessariamente as pesquisas citadas.</p></main>`;
@@ -92,15 +90,48 @@ function factsCards(c) {
 }
 
 function appGuide(a) {
-  const g = a.guia_de_aplicacao || {};
-  const pre = g.preparacao || {};
-  const evalData = g.avaliacao || {};
-  const decisions = evalData.criterios_de_decisao || {};
-  return `<div class="long-guide">${g.pergunta_a_testar ? `<p class="guide-question">${esc(g.pergunta_a_testar)}</p>` : ''}<h4>Antes de começar</h4>${[['Competência a observar', g.competencia_observavel], ['Materiais', pre.materiais], ['Conjuntos de avaliação', pre.conjuntos], ['Tempo e custo', pre.tempo_e_custo], ['Controle de qualidade', pre.controle_de_qualidade]].filter(([a, b]) => b).map(([a, b]) => `<p class="edition-warning"><strong>${esc(a)}.</strong> ${esc(b)}</p>`).join('')}<h4>Roteiro completo</h4><ol class="guide-timeline">${arr(g.roteiro).map(step => `<li><span class="step-index">${nfmt(step.etapa || 0)}</span><strong>${esc(step.nome)}</strong><p>${esc(step.instrucao)}</p><small>${esc(step.saida)}</small></li>`).join('')}</ol><h4>Avaliação independente</h4>${p(evalData.tarefa_inedita)}${evalData.momento_sugerido ? `<p class="edition-warning"><strong>Quando reavaliar:</strong> ${esc(evalData.momento_sugerido)}</p>` : ''}<div class="tagstrip">${arr(evalData.indicadores).map(x => `<span>${esc(x)}</span>`).join('')}</div>${Object.keys(decisions).length ? `<h4>Como decidir</h4>${Object.entries(decisions).map(([k, v]) => `<p class="edition-warning"><strong>${esc(k.replaceAll('_', ' '))}:</strong> ${esc(v)}</p>`).join('')}` : ''}${g.o_que_nao_inferir ? `<p class="edition-warning"><strong>Limite da conclusão:</strong> ${esc(g.o_que_nao_inferir)}</p>` : ''}${g.seguranca ? `<p class="edition-warning"><strong>Segurança:</strong> ${esc(g.seguranca)}</p>` : ''}</div>`;
+  const g = a.guia_de_aplicacao || {}, basic = g.roteiro_para_iniciantes || {};
+  const worked = basic.exemplo_resolvido || a.exemplo_resolvido || {};
+  const challenge = basic.exercicio_inedito || a.exercicio_inedito || {};
+  const pre = g.preparacao || {}, evaluation = g.avaliacao || {}, decision = evaluation.criterios_de_decisao || {};
+  const ex1 = worked.pergunta_para_tentar ? `<div class="worked-example">
+    <div class="worked-kicker">01 · ENTENDA O CASO E TENTE RESPONDER</div>
+    ${basic.termos_essenciais ? `<p class="worked-gloss"><strong>Vocabulário:</strong> ${esc(basic.termos_essenciais)}</p>` : ''}
+    <p class="worked-scene"><strong>Situação:</strong> ${esc(worked.situacao)}</p>
+    <p class="worked-question"><strong>Pergunta:</strong> ${esc(worked.pergunta_para_tentar)}</p>
+    <p class="attempt-reminder">Escreva sua resposta ou “não sei” antes de abrir a explicação.</p>
+    <details class="worked-answer"><summary>Revelar resposta explicada</summary><p>${esc(worked.resposta_e_por_que)}</p></details>
+  </div>` : '';
+  const ex2 = challenge.pergunta ? `<div class="worked-example is-transfer">
+    <div class="worked-kicker">02 · AGORA VOCÊ: UM CASO DIFERENTE</div>
+    <p class="worked-scene"><strong>Nova situação:</strong> ${esc(challenge.situacao || '')}</p>
+    <p class="worked-question"><strong>Resolva sem consulta:</strong> ${esc(challenge.pergunta)}</p>
+    <p class="attempt-reminder">Só revele a solução depois de registrar sua própria tentativa.</p>
+    <details class="worked-answer"><summary>Revelar gabarito da variante</summary><p>${esc(challenge.gabarito_comentado)}</p></details>
+  </div>` : '';
+  return `<div class="long-guide">
+  ${basic.objetivo_em_linguagem_simples ? `<p class="guide-question">${esc(basic.objetivo_em_linguagem_simples)}</p>` : ''}
+  ${ex1}${ex2}
+  <h4>03 · Faça o exercício do começo ao fim</h4>
+  <p class="guide-intro">O exemplo ensina a regra. O segundo caso e as tentativas posteriores ajudam a observar se você consegue usá-la sem ajuda.</p>
+  <ol class="guide-timeline">${arr(g.roteiro).map(step => `<li><span class="step-index">${nfmt(step.etapa || 0)}</span><strong>${esc(step.nome)}</strong><p>${esc(step.instrucao)}</p><small>${esc(step.saida)}</small></li>`).join('')}</ol>
+  <h4>04 · Materiais e conferência</h4>
+  ${[['Materiais concretos', pre.materiais], ['Como criar mais questões', pre.conjuntos], ['Tempo previsto para o teste', pre.tempo_e_custo], ['Conferência dos gabaritos', pre.controle_de_qualidade]].filter(([_, val]) => val).map(([label, val]) => `<p class="edition-warning"><strong>${esc(label)}:</strong> ${esc(val)}</p>`).join('')}
+  <h4>05 · Avalie antes de decidir</h4>
+  ${evaluation.momento_sugerido ? `<p class="edition-warning"><strong>Reteste:</strong> ${esc(evaluation.momento_sugerido)}</p>` : ''}
+  <ul class="assessment-list">${arr(evaluation.indicadores).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+  ${Object.keys(decision).length ? `<h4>06 · Manter, ajustar ou abandonar</h4>${Object.entries(decision).map(([k, v]) => `<p class="edition-warning"><strong>${esc(k.replaceAll('_', ' '))}:</strong> ${esc(v)}</p>`).join('')}` : ''}
+  ${g.o_que_nao_inferir ? `<p class="edition-warning"><strong>O que não concluir:</strong> ${esc(g.o_que_nao_inferir)}</p>` : ''}
+  ${g.seguranca ? `<p class="edition-warning"><strong>Segurança:</strong> ${esc(g.seguranca)}</p>` : ''}
+  </div>`;
 }
 
 function domain(a, title, number) {
-  return `<article class="domain-card"><div class="domain-top"><span class="domain-type">${esc(title)}</span><span class="domain-no">${number}</span></div><h3>${esc(a.cenario || title)}</h3><ol>${arr(a.passos).map(x => `<li>${esc(x)}</li>`).join('')}</ol><div class="domain-outcome"><strong>O que observar:</strong> ${esc(a.entrega_observavel)}</div><details><summary class="action-toggle">Abrir guia de aplicação e avaliação</summary>${appGuide(a)}</details></article>`;
+  return `<article class="domain-card"><div class="domain-top"><span class="domain-type">${esc(title)}</span><span class="domain-no">${number}</span></div>
+  <h3>${esc(a.cenario || title)}</h3>
+  <p class="domain-blurb">Leia um caso, responda antes de ver a solução, experimente a técnica e resolva uma variante. Depois, confira se você ainda sabe fazer.</p>
+  <div class="domain-outcome"><strong>Você vai produzir:</strong> ${esc(a.entrega_observavel)}</div>
+  <details class="app-steps"><summary class="action-toggle">Abrir exemplo e roteiro completo</summary>${appGuide(a)}</details></article>`;
 }
 
 function exampleSwitch(examples, id) {
@@ -186,7 +217,7 @@ function renderAtlas() {
 }
 
 function renderFileHelp(reason = '') {
-  return `<header class="header header-with-donation"><div class="header-identity"><a class="brand" href="#/capa">Cognitio</a>${renderDonation()}</div></header><main class="page file-loader"><h1>Abra o livro</h1><p>O leitor carrega seus capítulos diretamente do arquivo JSON, sem copiá-los para o HTML.</p><p><strong>Para abrir com duplo clique:</strong> selecione o arquivo <code>cognitio_capitulos_edicao_pratica.json</code> que está nesta pasta. Isso contorna a restrição de acesso a arquivos locais de alguns navegadores.</p><label class="file-picker" tabindex="0">Selecionar JSON <input id="json-picker" type="file" accept=".json,application/json"></label><p>Ou abra esta pasta com um servidor local: <code>python3 -m http.server 8000</code> e visite <code>http://localhost:8000</code>. Nesse modo, o carregamento é automático.</p>${reason ? `<p role="alert" style="color:var(--rust)">${esc(reason)}</p>` : ''}</main>`;
+  return `<header class="header header-with-donation"><div class="header-identity"><a class="brand" href="#/capa">Cognitio</a>${renderDonation()}</div></header><main class="page file-loader"><h1>Abra o livro</h1><p>O leitor carrega seus capítulos diretamente do arquivo JSON, sem copiá-los para o HTML.</p><p><strong>Para abrir com duplo clique:</strong> selecione o arquivo <code>cognitio_capitulos_v3.json</code> que está nesta pasta. Isso contorna a restrição de acesso a arquivos locais de alguns navegadores.</p><label class="file-picker" tabindex="0">Selecionar JSON <input id="json-picker" type="file" accept=".json,application/json"></label><p>Ou abra esta pasta com um servidor local: <code>python3 -m http.server 8000</code> e visite <code>http://localhost:8000</code>. Nesse modo, o carregamento é automático.</p>${reason ? `<p role="alert" style="color:var(--rust)">${esc(reason)}</p>` : ''}</main>`;
 }
 
 function activeRoute() {
