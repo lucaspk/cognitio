@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2eee7">
+  <meta name="description" content="Cognitio: uma história interativa da ciência da aprendizagem, com evidências, aplicações em computação e medicina e experimentos verificáveis.">
+  <title>Cognitio — Ciência da aprendizagem</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #f2eee7;
+      --paper: #faf8f4;
+      --paper-2: #f7f3ed;
+      --ink: #302e29;
+      --muted: #7e7a72;
+      --line: #d8d2c7;
+      --red: #c9201a;
+      --rust: #ac4b31;
+      --green: #21382f;
+      --brown: #76583d;
+      --serif: 'Playfair Display', Georgia, serif;
+      --text-serif: 'Libre Baskerville', Georgia, serif;
+      --sans: 'DM Sans', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { font: inherit; }
+    a { color: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-offset: 5px; }
+    ::selection { background: rgba(201, 32, 26, .17); }
+
+    .reading-track {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--red);
+      z-index: 60;
+      width: 0;
+      transition: width .12s;
+      pointer-events: none;
+    }
+
+    .header {
+      width: 100%;
+      height: 122px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 36px clamp(28px, 4.75vw, 92px) 0;
+      position: relative;
+      z-index: 15;
+    }
+
+    .brand {
+      font-family: var(--serif);
+      color: var(--red);
+      font-size: clamp(38px, 3.3vw, 53px);
+      line-height: 1;
+      letter-spacing: -.055em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .top-link {
+      border: 0;
+      background: none;
+      text-decoration: none;
+      color: #6f6b64;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      margin-top: 18px;
+      transition: color .2s;
+    }
+
+    .top-link:hover { color: var(--red); }
+    .top-link span { margin-right: 8px; }
+
+    .page {
+      animation: page-enter .44s ease both;
+    }
+
+    @keyframes page-enter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cover — mesma composição da versão arquivada */
+    .cover {
+      --cover-padding: clamp(1.5rem, 5vw, 6rem);
+      --cover-ink: #bd160f;
+      --cover-serif: 'Playfair Display', Georgia, serif;
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+      gap: clamp(1rem, 3vw, 3.5rem);
+      min-height: 100vh;
+      min-height: 100svh;
+      align-items: center;
+      padding: var(--cover-padding) max(var(--cover-padding), calc((100vw - 1500px) / 2));
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(ellipse at 68% 51%, rgb(255 249 236 / 55%), transparent 48%),
+        linear-gradient(110deg, #fff4e3 0%, #f8ead4 100%);
+      animation: none;
+    }
+
+    .cover-copy {
+      grid-column: 1;
+      grid-row: 1;
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      padding-bottom: 1rem;
+      animation: cover-copy-in 900ms ease-out both;
+    }
+
+    .cover-title {
+      margin: 0 0 clamp(1.5rem, 3vw, 2.8rem) -.035em;
+      font-family: var(--cover-serif);
+      font-size: clamp(4rem, 8.5vw, 9rem);
+      font-weight: 400;
+      letter-spacing: -.075em;
+      line-height: 1.08;
+      color: var(--cover-ink);
+      text-shadow: 0 2px 0 rgb(255 246 231 / 35%);
+    }
+
+    .site-donation {
+      max-width: 48ch;
+      margin: 12px 0 0;
+      color: #766757;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .cover .site-donation { margin: 0 0 1.75rem .65rem; }
+    .site-donation a {
+      text-decoration: underline;
+      text-decoration-color: rgb(118 103 87 / 45%);
+      text-underline-offset: 3px;
+    }
+    .site-donation a:hover { color: var(--red); }
+    .header.header-with-donation { height: auto; min-height: 122px; gap: 24px; padding-bottom: 20px; }
+    .header-identity { min-width: 0; }
+    .header-with-donation .header-right { flex-shrink: 0; }
+
+    .thin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      font-family: var(--text-serif);
+      font-style: italic;
+      font-size: clamp(20px, 2vw, 28px);
+      color: var(--red);
+      text-decoration: none;
+      border-bottom: 1px solid var(--red);
+      padding-bottom: 11px;
+      transition: gap .2s;
+    }
+
+    .thin-link:hover { gap: 27px; }
+
+    .cover .thin-link {
+      gap: 1rem;
+      margin-left: .65rem;
+      min-height: 44px;
+      padding: .4rem 0 .65rem;
+      border: 0;
+      color: var(--cover-ink);
+      font-family: var(--cover-serif);
+      font-size: clamp(1.2rem, 2.1vw, 1.8rem);
+      transition: gap 180ms ease, color 180ms ease;
+    }
+
+    .cover .thin-link:hover { gap: 1.35rem; color: #8f100c; }
+    .cover .thin-link:focus-visible { outline-color: var(--cover-ink); outline-offset: 6px; }
+    .cover .thin-link svg {
+      width: 1.65rem;
+      height: 1.05rem;
+      flex-shrink: 0;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.5;
+      transition: transform 180ms ease;
+    }
+    .cover .thin-link:hover svg { transform: translateX(3px); }
+
+    .cover-tree {
+      grid-column: 2;
+      grid-row: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: calc(100svh - 2 * var(--cover-padding));
+      object-fit: contain;
+      filter: drop-shadow(0 13px 10px rgb(89 61 34 / 8%));
+      animation: cover-tree-in 1.2s cubic-bezier(.22, 1, .36, 1) 180ms both;
+    }
+
+    @keyframes cover-tree-in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cover-copy-in {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Index */
+    .index-wrap {
+      max-width: 1840px;
+      margin: 0 auto;
+      padding: 74px clamp(28px, 4.75vw, 92px) 100px;
+    }
+
+    .index-intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin: 9px 0 44px;
+    }
+
+    .index-eyebrow, .eyebrow {
+      font-size: 12px;
+      letter-spacing: .21em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--rust);
+    }
+
+    .index-intro h1 {
+      font-family: var(--serif);
+      font-size: clamp(64px, 7vw, 110px);
+      font-weight: 400;
+      color: var(--red);
+      letter-spacing: -.035em;
+      line-height: 1.1;
+      margin: 8px 0 0;
+    }
+
+    .index-intro p {
+      max-width: 420px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin: 0 0 5px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+    }
+
+    .index-card {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      min-height: 430px;
+      padding: clamp(30px, 3.15vw, 55px);
+      transition: border-color .22s, background .22s, transform .22s, box-shadow .22s;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      text-decoration: none;
+    }
+
+    .index-card:hover {
+      border-color: #ad9e89;
+      transform: translateY(-4px);
+      box-shadow: 0 11px 34px rgba(58, 46, 36, .06);
+    }
+
+    .index-card:focus-visible { z-index: 2; }
+    .index-card.is-featured { border-color: #b5aa99; }
+
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 22px;
+      min-width: 0;
+    }
+
+    .card-date {
+      font-family: var(--serif);
+      color: var(--red);
+      letter-spacing: -.03em;
+      font-size: clamp(25px, 2.25vw, 37px);
+      white-space: nowrap;
+    }
+
+    .card-category {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      color: var(--muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-no {
+      font: 600 13px monospace;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .card-title {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(28.8px, 2.7vw, 43.2px);
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      font-weight: 400;
+      margin: 39px 0 22px;
+      max-width: 620px;
+      text-wrap: balance;
+    }
+
+
+    .card-descr {
+      font-size: 16px;
+      line-height: 1.85;
+      color: #5e5b54;
+      max-width: 610px;
+      margin: 0 0 32px;
+    }
+
+    .card-bottom {
+      display: flex;
+      align-items: end;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: auto;
+    }
+
+    .arrow-corner {
+      font-family: var(--serif);
+      font-size: 39px;
+      color: var(--red);
+      line-height: 1;
+      transition: transform .2s;
+    }
+
+    .index-card:hover .arrow-corner { transform: translate(5px, -5px); }
+    .index-footnote { font-size: 12px; color: var(--muted); margin-top: 28px; line-height: 1.7; }
+
+    /* Chapter Hero */
+    .chapter-shell { max-width: 1920px; margin: 0 auto; }
+    .chapter-hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      column-gap: 24px;
+      padding: clamp(32px, 4vw, 60px) clamp(28px, 4.75vw, 92px) 35px;
+    }
+
+    .hero-meta {
+      font: 700 13px/1.5 var(--sans);
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      color: var(--muted);
+    }
+
+    .hero-number {
+      justify-self: end;
+      font: 600 14px monospace;
+      color: var(--muted);
+    }
+
+    .chapter-hero h1 {
+      grid-column: 1 / -1;
+      font: 400 clamp(64.8px, 7.29vw, 123.12px)/1.1 var(--serif);
+      letter-spacing: -.035em;
+      text-transform: none;
+      color: var(--red);
+      margin: clamp(32px, 4vw, 64px) 0 0;
+      max-width: 1008px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .chapter-hero.is-prelim h1 { text-transform: uppercase; }
+
+    .hero-subtitle {
+      margin-top: 25px;
+      z-index: 3;
+      position: relative;
+      color: #6a645c;
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 700px;
+    }
+
+    .hero-description {
+      grid-column: 1 / -1;
+      position: relative;
+      z-index: 3;
+      max-width: 740px;
+      font-size: 17px;
+      line-height: 1.7;
+      color: #5a564e;
+      margin-top: 25px;
+    }
+
+    .hero-tags {
+      font-size: 13px;
+      color: var(--muted);
+      position: relative;
+      z-index: 3;
+      margin-top: 40px;
+      letter-spacing: .015em;
+    }
+
+    .hero-tags span { margin: 0 12px; color: #aa9e8d; }
+
+    .story-main { margin: 0 clamp(28px, 4.75vw, 92px); }
+
+    .lead-intro {
+      padding: 90px 0 100px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 19% minmax(0, 1fr);
+      gap: 45px;
+    }
+
+    .side-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--rust);
+      font-weight: 700;
+      padding-top: 11px;
+    }
+
+    .lead-intro p {
+      font: 400 clamp(22.5px, 2.52vw, 40.5px)/1.58 var(--text-serif);
+      letter-spacing: -.035em;
+      max-width: 1130px;
+      margin: 0;
+    }
+
+    .story-section { padding: 80px 0; border-bottom: 1px solid var(--line); }
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .section-kicker {
+      font-size: 12px;
+      color: var(--rust);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .19em;
+      margin: 0 0 18px;
+    }
+
+    .section-title {
+      font: 400 clamp(34.02px, 3.402vw, 56.7px)/1.2 var(--serif);
+      letter-spacing: -.02em;
+      margin: 0;
+      max-width: 980px;
+    }
+
+    .section-note {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 340px;
+      align-self: end;
+    }
+
+    .story-copy {
+      max-width: 1120px;
+      columns: 2;
+      column-gap: 70px;
+    }
+
+    .story-copy p {
+      font-size: 17px;
+      line-height: 1.9;
+      color: #514f49;
+      margin: 0 0 20px;
+      break-inside: avoid;
+    }
+
+    .story-copy p:first-child:first-letter {
+      font: 400 65px/.8 var(--serif);
+      float: left;
+      color: var(--red);
+      padding-right: 8px;
+    }
+
+    /* Editorial Evidence Cards */
+    .four-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .evidence-card {
+      min-height: 260px;
+      padding: 26px 25px;
+      background: #fbf9f5;
+      border: 1px solid #e7e1d7;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .evidence-card .evidence-label {
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: #2c4036;
+    }
+
+    .evidence-card:nth-child(2) .evidence-label { color: #a85134; }
+    .evidence-card:nth-child(3) .evidence-label { color: #c42420; }
+    .evidence-card .evidence-body { font-size: 15px; line-height: 1.72; color: #3c3b36; margin: 0; }
+    .evidence-card small { font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: auto; }
+    .evidence-card.is-dark { background: var(--green); border-color: var(--green); color: #f7f6f0; }
+    .evidence-card.is-dark .evidence-label { color: #fff; }
+    .evidence-card.is-dark .evidence-body { color: #f5f5ef; }
+    .evidence-card.is-dark small { color: #b6c8be; }
+
+    .verdict {
+      margin-top: 19px;
+      background: #eae7e0;
+      padding: 20px 24px;
+      color: #49443c;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .verdict strong { color: var(--ink); }
+
+    [hidden] { display: none !important; }
+    .opening-copy { min-width: 0; }
+    .opening-copy p + p { margin-top: 1.5em; }
+
+    .example-toggle {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-width: 100%;
+      padding: 4px;
+      margin-bottom: 25px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper-2);
+    }
+    .example-toggle button {
+      flex: 1;
+      min-height: 44px;
+      padding: 10px clamp(16px, 3vw, 30px);
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      transition: background .2s, color .2s;
+    }
+    .example-toggle button:hover { color: var(--red); }
+    .example-toggle button[aria-pressed="true"] { background: var(--red); color: var(--paper); }
+    .example-panel { max-width: 1120px; }
+
+    /* Applied / Domain Cards */
+    .domain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .domain-card {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 40px 42px;
+      min-height: 0;
+    }
+
+    .domain-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid var(--line);
+      align-items: baseline;
+    }
+
+    .domain-type {
+      color: var(--rust);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: .17em;
+    }
+
+    .domain-no { font-size: 13px; color: var(--muted); font-family: monospace; }
+    .domain-card h3 {
+      font: 400 clamp(27px, 2.61vw, 41.4px)/1.25 var(--serif);
+      letter-spacing: -.015em;
+      margin: 28px 0 24px;
+    }
+
+    .domain-card ol { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+    .domain-card li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 27px 1fr;
+      gap: 14px;
+      margin: 18px 0;
+      color: #55534e;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .domain-card li:before {
+      content: '0' counter(step);
+      font: 600 11px/2 var(--sans);
+      color: var(--rust);
+    }
+
+    .domain-outcome {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .domain-outcome strong { font-weight: 700; color: #514a40; }
+
+    .domain-card .action-toggle {
+      border: 0;
+      border-top: 1px solid var(--line);
+      padding: 16px 0 0;
+      margin-top: 20px;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .domain-card .action-toggle:after { content: '+'; font: 25px/1 var(--serif); }
+    .domain-card details[open] .action-toggle:after { content: '−'; }
+    .domain-card details[open] .action-toggle { margin-bottom: 20px; }
+
+    /* Guides & Lists */
+    .long-guide { padding-top: 10px; border-top: 1px solid var(--line); margin-top: 9px; }
+    .long-guide h4 { font: 400 26.1px/1.3 var(--serif); margin: 35px 0 15px; }
+    .guide-question { font: italic 19px/1.65 var(--text-serif); color: var(--brown); margin: 16px 0; }
+    .guide-timeline { padding: 0; list-style: none; counter-reset: guide; }
+    .guide-timeline li {
+      counter-increment: guide;
+      display: block;
+      border-top: 1px solid #e6ded1;
+      padding: 20px 0;
+      margin: 0;
+    }
+    .guide-timeline li:before { display: none; }
+    .guide-timeline .step-index { font: 15px var(--serif); color: var(--red); }
+    .guide-timeline strong { display: block; margin: 7px 0 5px; }
+    .guide-timeline p { margin: 0 0 5px; font-size: 14px; line-height: 1.7; color: #514e48; }
+    .guide-timeline small { font-size: 12px; line-height: 1.6; color: var(--muted); }
+    .guide-list { padding-left: 18px; color: #5a554f; font-size: 14px; line-height: 1.9; }
+    .guide-list li { display: list-item; margin: 6px 0; counter-increment: none; }
+    .guide-list li:before { display: none; }
+
+    .measure-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 35px;
+    }
+    .measure-grid article { border-top: 2px solid var(--red); padding-top: 24px; }
+    .measure-grid h3 { font: 400 27px var(--serif); margin: 0 0 17px; }
+    .measure-grid p { font-size: 14px; line-height: 1.8; color: #5c5850; margin: 0; }
+
+    .summary-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+    .summary-pair > div { border-top: 1px solid var(--line); padding-top: 22px; }
+    .summary-pair h3 { font: 400 25.2px var(--serif); margin: 0 0 15px; }
+    .summary-pair p { font-size: 14px; line-height: 1.75; color: #5d554c; }
+
+    .critical-foot { font-size: 13px; line-height: 1.85; color: var(--muted); max-width: 940px; margin-top: 38px; }
+    
+    .ref-list { margin: 0; padding: 0; list-style: none; max-width: 1130px; }
+    .ref-list li {
+      padding: 24px 0;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 25px;
+    }
+    .ref-year { font-family: var(--serif); font-size: 25px; color: var(--red); }
+    .ref-list strong { font-size: 15px; line-height: 1.6; display: block; font-weight: 600; }
+    .ref-list span { font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .ref-list a {
+      display: inline-block;
+      color: var(--rust);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      font-size: 13px;
+      margin-top: 9px;
+      overflow-wrap: anywhere;
+    }
+    .edition-warning { font-size: 12px; line-height: 1.8; color: var(--muted); margin: 25px 0 0; }
+
+    /* Footer & Navigation */
+    .footer-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 45px 0 90px;
+    }
+    .footer-nav button { border: 0; background: none; padding: 0; text-align: left; max-width: 560px; }
+    .footer-nav button:last-child { text-align: right; justify-self: end; }
+    .footer-nav small { font-size: 12px; color: var(--muted); display: block; margin-bottom: 14px; }
+    .footer-nav strong { font: 400 clamp(17px, 1.5vw, 23px)/1.4 var(--serif); color: var(--red); }
+    .footer-nav a { display: block; text-decoration: none; max-width: 560px; }
+    .footer-nav a:hover strong { text-decoration: underline; text-underline-offset: 7px; }
+    .footer-nav > div:last-child { text-align: right; }
+    .footer-nav .footer-nav a { text-align: inherit; }
+
+    /* Prelim & Components */
+    .prelim-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .prelim-box { background: var(--paper); border: 1px solid var(--line); padding: 36px; min-height: 210px; }
+    .prelim-box b { font-family: var(--serif); font-size: 37.8px; color: var(--red); font-weight: 400; }
+    .prelim-box p { font-size: 17px; line-height: 1.8; max-width: 500px; color: #504e48; margin: 18px 0 0; }
+    
+    .howto { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+    .howto-step { border-top: 1px solid var(--line); padding: 20px 10px 0 0; }
+    .howto-step .howto-number { font: 400 37.8px var(--serif); color: var(--red); }
+    .howto-step h3 { font: 400 22.5px var(--serif); margin: 23px 0 13px; }
+    .howto-step p { font-size: 14px; line-height: 1.85; color: #5d5851; margin: 0; }
+    
+    .statute { padding: 48px; max-width: 1000px; background: var(--green); color: #fafaf5; }
+    .statute small { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #c8d6cc; }
+    .statute blockquote { font: 400 clamp(27px, 3.06vw, 46.8px)/1.35 var(--text-serif); letter-spacing: -.04em; margin: 28px 0; }
+    .statute p { color: #c8d6cc; font-size: 14px; line-height: 1.8; margin: 0; }
+
+    .header-right { display: flex; align-items: center; gap: 30px; }
+    .header-right a { text-decoration: none; }
+    .header-right a:hover { color: var(--red); }
+    
+    .index-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(12rem, 20rem) auto;
+      align-items: center;
+      gap: 12px 20px;
+      padding-bottom: 24px;
+    }
+    .field {
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      padding: 12px 20px;
+      border: 1px solid rgb(118 88 61 / 16%);
+      border-radius: 999px;
+      background: rgb(250 248 244 / 65%);
+      color: var(--ink);
+      font: 14px var(--sans);
+      box-shadow: 0 2px 8px rgb(48 46 41 / 2%);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .field:hover { border-color: rgb(118 88 61 / 35%); background: var(--paper); }
+    .field:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 3px;
+      background: var(--paper);
+      box-shadow: 0 3px 12px rgb(48 46 41 / 5%);
+    }
+    .search-control { position: relative; min-width: 0; }
+    .search-control svg {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      width: 18px;
+      height: 18px;
+      transform: translateY(-50%);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .search-field { padding-left: 50px; }
+    .search-field::placeholder { color: var(--muted); opacity: 1; }
+    .period-control { position: relative; min-width: 0; }
+    .period-control::after {
+      content: '';
+      position: absolute;
+      right: 21px;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid var(--muted);
+      border-bottom: 1.5px solid var(--muted);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+    .period-field { appearance: none; padding-right: 44px; text-overflow: ellipsis; }
+    .filter-label { grid-column: 1 / -1; margin: 0; font-size: 12px; color: var(--muted); }
+    .filter-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      min-height: 48px;
+      padding: 4px 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .switch-track {
+      position: relative;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 22px;
+      border: 1px solid #a49b8e;
+      border-radius: 999px;
+      background: #ddd6cb;
+      transition: background .2s, border-color .2s;
+    }
+    .switch-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--paper);
+      box-shadow: 0 1px 2px rgb(48 46 41 / 15%);
+      transition: transform .2s;
+    }
+    .filter-button[aria-checked="true"] .switch-track { background: var(--red); border-color: var(--red); }
+    .filter-button[aria-checked="true"] .switch-track::after { transform: translateX(14px); }
+    #index-results > .phase-block:first-child .phase-heading { padding-top: 16px; }
+
+    .phase-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 30px;
+      border-bottom: 1px solid var(--line);
+      padding: 52px 0 22px;
+      margin-bottom: 20px;
+    }
+    .phase-heading h2 { font: 400 clamp(35px, 4vw, 59px)/1.2 var(--serif); margin: 12px 0 0; letter-spacing: -.02em; }
+    .phase-heading p { font: 13px/1.7 var(--sans); color: var(--muted); max-width: 390px; margin: 0; }
+
+    .evaluation-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .evaluation-items > article { border-top: 2px solid var(--red); padding-top: 20px; }
+    .evaluation-items h3 { font: 400 25.2px var(--serif); margin: 0 0 12px; }
+    .evaluation-items p { font-size: 14px; line-height: 1.75; color: #5e5951; margin: 0; }
+
+    .rubric { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .rubric article { padding: 30px; background: var(--paper); border: 1px solid var(--line); }
+    .rubric b { font: 400 24.3px var(--serif); color: var(--red); }
+    .rubric p { font-size: 15px; line-height: 1.7; color: #5c574f; }
+
+    .sidebar-navigation { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--muted); }
+    .sidebar-navigation a { text-decoration: none; border-bottom: 1px solid #b7aa9d; padding-bottom: 4px; }
+    .sidebar-navigation a:hover { color: var(--red); }
+
+    .mini-context { display: flex; gap: 12px; align-items: baseline; margin-top: 25px; color: var(--muted); font-size: 12px; }
+    .mini-context strong { color: var(--red); font: 25.2px var(--serif); }
+    
+    .tagstrip { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 20px; }
+    .tagstrip span { font-size: 11px; letter-spacing: .04em; border: 1px solid var(--line); padding: 8px 10px; color: var(--muted); }
+
+    .prelim-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .prelim-list .prelim-box { min-height: 170px; }
+    .prelim-box h3 { font: 400 26.1px var(--serif); margin: 18px 0 8px; }
+    .prelim-box p { font-size: 15px; line-height: 1.7; margin: 0; }
+    .prelim-section { padding-bottom: 90px; }
+    .prelim-section h2 { font: 400 clamp(39.6px, 4.32vw, 65.7px)/1.1 var(--serif); margin: 0 0 45px; }
+
+    .check-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .check-col { border-top: 1px solid var(--line); padding-top: 20px; }
+    .check-col h3 { font: 400 28.8px var(--serif); margin: 0 0 20px; }
+    .check-col li { font-size: 14px; line-height: 1.75; color: #5e584f; margin-bottom: 12px; }
+
+    .file-loader { width: min(550px, calc(100% - 44px)); margin: 65px auto 20px; padding: 35px; background: var(--paper); border: 1px solid var(--line); }
+    .file-loader h1 { font: 400 52px var(--serif); color: var(--red); margin: 0 0 17px; }
+    .file-loader p { font-size: 14px; color: #5d5950; line-height: 1.8; }
+    .file-picker { display: inline-block; cursor: pointer; padding: 13px 20px; background: var(--green); color: white; font-size: 13px; margin-top: 12px; }
+    .file-picker input { display: none; }
+    .file-loader code { font-size: 12px; overflow-wrap: anywhere; }
+    .subtle-link { color: var(--rust); text-decoration: underline; text-underline-offset: 4px; font-size: 13px; }
+
+    .end-cover { padding: 85px 0 95px; }
+    .end-cover h2 { font: 400 clamp(57.6px, 6.66vw, 100.8px)/.98 var(--serif); color: var(--red); max-width: 1100px; letter-spacing: -.055em; margin: 0 0 35px; }
+    .end-cover p { font: 400 clamp(18px, 2.07vw, 27px)/1.7 var(--text-serif); max-width: 980px; }
+    .end-cover .thin-link { font-size: 19px; }
+
+    .atlas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .atlas-node { background: var(--paper); border: 1px solid var(--line); padding: 20px; min-height: 115px; text-align: left; text-decoration: none; }
+    .atlas-node small { display: block; font-size: 11px; color: var(--rust); margin-bottom: 10px; }
+    .atlas-node strong { font: 400 23px/1.3 var(--serif); }
+    .atlas-node:hover { border-color: var(--red); }
+    
+    .atlas-deps { display: flex; flex-wrap: wrap; gap: 8px; }
+    .atlas-deps a { padding: 9px 13px; background: var(--paper); font-size: 13px; color: var(--rust); border: 1px solid var(--line); text-decoration: none; }
+    .atlas-deps a:hover { border-color: var(--red); }
+
+    .index-zero { margin-bottom: 40px; }
+    .index-zero .index-card { min-height: 250px; }
+    .index-zero .card-title { margin: 28px 0 13px; }
+    .footer-quiet { margin: 30px 0 0; font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .empty-state { font: italic 22px var(--text-serif); color: var(--muted); padding: 40px 0; }
+    .loading { min-height: 350px; display: grid; place-items: center; font: 24px var(--serif); color: var(--red); }
+
+    @media(max-width: 1200px) {
+      .chapter-hero h1 { font-size: clamp(55.08px, 7.29vw, 105.3px); }
+      .four-cards { grid-template-columns: repeat(2, 1fr); }
+      .index-card { min-height: 390px; }
+      .card-title { font-size: 34.2px; }
+      .howto { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media(max-width: 1000px) {
+      .atlas-grid { grid-template-columns: repeat(2, 1fr); }
+      .check-cols { grid-template-columns: 1fr; }
+      .story-copy { columns: 1; }
+      .summary-pair { grid-template-columns: 1fr; }
+      .evaluation-items { grid-template-columns: 1fr; }
+    }
+
+    @media(max-width: 790px) {
+      .header { height: 91px; padding: 24px 22px 0; }
+      .brand { font-size: 40px; }
+      .top-link { font-size: 12px; margin-top: 11px; }
+      .index-wrap { padding: 36px 20px 65px; }
+      .index-intro { display: block; margin-bottom: 28px; }
+      .index-intro h1 { font-size: 73px; }
+      .index-intro p { font-size: 14px; margin-top: 15px; }
+      .chapter-grid { grid-template-columns: 1fr; gap: 15px; }
+      .index-card { min-height: 355px; padding: 29px; }
+      .card-title { font-size: clamp(25.2px, 4.95vw, 34.2px); margin-top: 29px; }
+      .card-date { font-size: 27px; }
+      .card-head { gap: 13px; }
+      .card-category { font-size: 10px; }
+      .card-descr { font-size: 14px; }
+      .chapter-hero { padding: 28px 22px 24px; }
+      .hero-meta { font-size: 11px; }
+        .chapter-hero h1 { font-size: clamp(43.74px, 8.91vw, 81px); max-width: 100%; overflow-wrap: anywhere; }
+      .hero-tags { font-size: 12px; }
+      .story-main { margin: 0 22px; }
+      .lead-intro { padding: 55px 0; grid-template-columns: 1fr; gap: 20px; }
+      .lead-intro p { font-size: clamp(21.6px, 4.05vw, 29.7px); }
+      .story-section { padding: 70px 0; }
+      .section-head { display: block; }
+      .section-title { font-size: 42.93px; }
+      .section-note { margin-top: 20px; }
+      .domain-grid, .measure-grid, .prelim-grid { grid-template-columns: 1fr; gap: 20px; }
+      .domain-card { padding: 30px; }
+      .four-cards { grid-template-columns: 1fr 1fr; }
+      .evidence-card { padding: 21px; min-height: 280px; }
+      .evidence-card .evidence-body { font-size: 14px; }
+      .ref-list li { grid-template-columns: 75px 1fr; gap: 15px; }
+      .footer-nav { padding: 35px 0 65px; }
+      .howto { grid-template-columns: 1fr 1fr; }
+      .statute { padding: 31px; }
+      .phase-heading { display: block; }
+      .phase-heading p { margin-top: 13px; }
+      .prelim-list { grid-template-columns: 1fr; }
+      .rubric { grid-template-columns: 1fr; }
+      .atlas-grid { grid-template-columns: 1fr; }
+      .index-zero .index-card { min-height: 230px; }
+      .index-tools { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; }
+      .search-control { grid-column: 1 / -1; }
+      .index-tools .filter-button { font-size: 12px; gap: 8px; }
+      .hero-subtitle { font-size: 14px; }
+    }
+
+    @media(max-width: 480px) {
+      .header { padding-top: 25px; }
+      .header-right { gap: 10px; }
+      .header-right a { font-size: 11px; }
+      .chapter-hero h1 { font-size: clamp(39.69px, 9.72vw, 51.84px); line-height: 1.1; }
+      .four-cards { grid-template-columns: 1fr; }
+      .evidence-card { min-height: 0; }
+      .howto { grid-template-columns: 1fr; }
+      .index-card { min-height: 330px; }
+      .card-title { font-size: clamp(23.4px, 6.3vw, 28.8px); }
+      .card-date { font-size: 26px; }
+      .card-head { flex-wrap: wrap; }
+      .card-category { max-width: 50%; }
+      .index-intro h1 { font-size: 65px; }
+      .prelim-box { padding: 24px; }
+      .ref-list li { display: block; }
+      .ref-year { display: block; margin-bottom: 10px; }
+      .footer-nav strong { font-size: 16px; }
+      .file-loader { padding: 26px; }
+      .file-loader h1 { font-size: 43px; }
+      .end-cover h2 { font-size: 50.4px; }
+    }
+
+    @media (max-width: 760px) {
+      .cover {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        align-content: space-between;
+        gap: clamp(2rem, 6svh, 4rem);
+        padding: clamp(3rem, 9svh, 6rem) max(1.25rem, env(safe-area-inset-right), env(safe-area-inset-left)) max(1rem, env(safe-area-inset-bottom));
+      }
+      .cover-tree {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: center;
+        width: min(100%, 34rem);
+        max-height: none;
+      }
+      .cover-copy { padding-bottom: 0; text-align: center; }
+      .cover-title {
+        margin-left: 0;
+        margin-bottom: 1.25rem;
+        font-size: clamp(3.5rem, 17vw, 7rem);
+      }
+      .cover .site-donation { margin-inline: auto; }
+      .cover .thin-link { margin-left: 0; font-size: clamp(1.2rem, 4.5vw, 1.5rem); }
+    }
+
+    @media (max-height: 500px) and (min-width: 761px) {
+      .cover { --cover-padding: 1.5rem; }
+      .cover-title { font-size: clamp(4rem, 8vw, 6rem); margin-bottom: 1rem; }
+    }
+
+    @media(prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *:before, *:after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress" class="reading-track" aria-hidden="true"></div>
+  <div id="app"><div class="loading">Carregando Cognitio…</div></div>
+
+  <script>
+    'use strict';
+    const JSON_URL = './cognitio_capitulos_v2.json';
+    const TREE = './assets/arvore.png';
+    let DATA = null;
+    let state = { query: '', onlyEssential: false, phase: 'todas', exampleArea: 'computacao' };
+
+    const el = id => document.getElementById(id);
+    const esc = value => String(value ?? '').replace(/[&<>"']/g, c => {
+    switch (c) {
+        case '&': return '&';
+        case '<': return '<';
+        case '>': return '>';
+        case '"': return '"';
+        case "'": return '&#39;';
+        default: return c;
+    }
+    });
+    const safeUrl = (v) => { try { let u = new URL(v, location.href); return ['https:', 'http:'].includes(u.protocol) ? u.href : '#'; } catch { return '#'; } };
+    const arr = v => Array.isArray(v) ? v : [];
+    const p = v => v ? `<p>${esc(v)}</p>` : '';
+    const items = v => `<ul class="guide-list">${arr(v).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    const link = (hash, label, cls = '') => `<a class="${cls}" href="#${esc(hash)}">${esc(label)}</a>`;
+    const nfmt = n => String(n).padStart(2, '0');
+    const chapters = () => arr(DATA?.capitulos).slice().sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+    const allEntries = () => [DATA.capitulo_preliminar, ...chapters(), { id: 'conclusao', titulo: DATA.conclusao?.titulo || 'Conclusão' }];
+
+    function renderDonation() {
+      return `<p class="site-donation">Se este site te foi útil, considere <a href="https://hospitaldafap.org.br/doe-para-fap">fazer uma doação ao Hospital da FAP</a>.</p>`;
+    }
+
+    function makeHeader(context = 'indice') {
+      if (context === 'capa') return '';
+      const goBack = context === 'indice' ? '#/capa' : '#/indice';
+      const caption = '← Voltar ao índice';
+      return `<header class="header header-with-donation"><div class="header-identity"><a class="brand" href="#/capa" aria-label="Cognitio, ir à capa">Cognitio</a>${renderDonation()}</div><nav class="header-right" aria-label="Navegação">${context === 'indice' ? '<a class="top-link" href="#/atlas">Atlas semântico</a>' : `<a class="top-link" href="${goBack}">${caption}</a>`}</nav></header>`;
+    }
+
+    function hero(title, meta, number, subtitle = '', prelim = false) {
+      return `<div class="chapter-hero ${prelim ? 'is-prelim' : ''}"><div class="hero-meta">${esc(meta)}</div><div class="hero-number">${esc(number)}</div><h1>${esc(title)}</h1>${subtitle ? `<div class="hero-description">${esc(subtitle)}</div>` : ''}</div>`;
+    }
+
+    function footerNav(current) {
+      const entries = allEntries();
+      const pos = entries.findIndex(e => e.id === current);
+      const prev = entries[pos - 1], next = entries[pos + 1];
+      const dest = e => e.id === 'preliminar' ? '#/preliminar' : e.id === 'conclusao' ? '#/conclusao' : `#/capitulo/${encodeURIComponent(e.id)}`;
+      return `<nav class="footer-nav" aria-label="Capítulos adjacentes"><div>${prev ? `<a href="${dest(prev)}"><small>← Anterior</small><strong>${esc(prev.titulo)}</strong></a>` : `<a href="#/indice"><small>← Voltar</small><strong>Índice</strong></a>`}</div><div>${next ? `<a href="${dest(next)}"><small>Próximo →</small><strong>${esc(next.titulo)}</strong></a>` : `<a href="#/indice"><small>Voltar ao índice →</small><strong>Índice</strong></a>`}</div></nav>`;
+    }
+
+    function renderCover() {
+      return `<main class="page cover" aria-labelledby="book-title"><img src="${TREE}" alt="Ilustração de uma árvore antiga com raízes expostas" class="cover-tree" width="1254" height="1254" fetchpriority="high"><div class="cover-copy"><h1 class="cover-title" id="book-title">Cognitio</h1>${renderDonation()}<a class="thin-link" href="#/indice"><span>Acessar o livro</span><svg viewBox="0 0 32 20" aria-hidden="true"><path d="M1 10h26M19 2l8 8-8 8" /></svg></a></div></main>`;
+    }
+
+    function card(c, index, featured = false) {
+      const prelim = c.id === 'preliminar';
+      const href = prelim ? '#/preliminar' : `#/capitulo/${encodeURIComponent(c.id)}`;
+      const date = prelim ? 'ABERTURA' : c.ano_marco;
+      const category = prelim ? c.indice?.categoria : (c.eixo || 'PESQUISA');
+      return `<a class="index-card ${featured ? 'is-featured' : ''}" href="${href}" aria-label="Abrir ${esc(c.titulo)}"><div class="card-head"><span class="card-date">${esc(date)}</span><span class="card-category">${esc(category)}</span><span class="card-no">${prelim ? '00' : nfmt(c.ordem || index)}</span></div><h3 class="card-title">${esc(c.titulo)}</h3><p class="card-descr">${esc(c.indice?.pilula || c.cabecalho?.descricao_curta || '')}</p><div class="card-bottom"><span class="arrow-corner" aria-hidden="true">↗</span></div></a>`;
+    }
+
+    function renderIndex() {
+      const c = chapters();
+      const q = state.query.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const indexed = c.filter(x => {
+        if (state.onlyEssential && x.prioridade_editorial !== 'essencial') return false;
+        const flat = [x.titulo, x.eixo, x.ano_marco, x.indice?.pilula, ...(arr(x.referencias_ids))].join(' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        if (q && !flat.includes(q)) return false;
+        if (state.phase !== 'todas' && !DATA.fases.find(f => f.id === state.phase)?.capitulos.includes(x.id)) return false;
+        return true;
+      });
+      const grouped = arr(DATA.fases).map(f => ({ ...f, found: indexed.filter(x => arr(f.capitulos).includes(x.id)) })).filter(f => f.found.length);
+      const prelim = DATA.capitulo_preliminar;
+      return `${makeHeader('indice')}<main class="page index-wrap"><div class="index-intro"><h1>Índice</h1></div>
+      <section class="index-zero" aria-label="Antes de começar"><div class="index-eyebrow">Prólogo · comece por aqui</div><div class="chapter-grid" style="margin-top:18px">${card(prelim, 0, true)}<a class="index-card" href="#/conclusao"><div class="card-head"><span class="card-date">FINAL</span><span class="card-category">SÍNTESE E DECISÃO</span><span class="card-no">↘</span></div><h3 class="card-title">Conclusão</h3><p class="card-descr">${esc(DATA.conclusao?.criterio_de_adocao_pessoal || 'Como decidir se uma técnica vale a pena.')}</p><div class="card-bottom"><span class="arrow-corner">↗</span></div></a></div></section>
+      <div class="index-tools" role="search" aria-label="Filtros do índice"><div class="search-control"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5" stroke-linecap="round"/></svg><input id="search" class="field search-field" type="search" value="${esc(state.query)}" aria-label="Buscar no índice" placeholder="Buscar no índice"></div><div class="period-control"><select id="phase" class="field period-field" aria-label="Selecionar período"><option value="todas">Todos os períodos</option>${arr(DATA.fases).map(f => `<option value="${esc(f.id)}" ${state.phase === f.id ? 'selected' : ''}>${esc(f.periodo)} · ${esc(f.titulo)}</option>`).join('')}</select></div><button class="filter-button" id="essential" type="button" role="switch" aria-checked="${state.onlyEssential}" aria-controls="index-results"><span class="switch-track" aria-hidden="true"></span><span>Somente essenciais</span></button><p class="filter-label" id="count" role="status" aria-live="polite" aria-atomic="true">${resultCount(indexed.length, c.length)}</p></div>
+      <div id="index-results">${renderIndexGroups(grouped)}</div><p class="index-footnote">As categorias e os recortes históricos são escolhas editoriais; os experimentos pessoais propostos não reproduzem necessariamente as pesquisas citadas.</p></main>`;
+    }
+
+    function renderIndexGroups(grouped) {
+      return grouped.length ? grouped.map(f => `<section class="phase-block"><div class="phase-heading"><div><span class="eyebrow">${esc(f.periodo)} · ${String(f.found.length).padStart(2, '0')} capítulos</span><h2>${esc(f.titulo)}</h2></div><p>${esc(f.tese)}</p></div><div class="chapter-grid">${f.found.map((x, i) => card(x, i, x.prioridade_editorial === 'essencial' && i === 0)).join('')}</div></section>`).join('') : `<p class="empty-state">Nenhum capítulo corresponde a essa busca.</p>`;
+    }
+
+    function section(title, kicker, body, note = '') {
+      return `<section class="story-section"><div class="section-head"><div><div class="section-kicker">${esc(kicker)}</div><h2 class="section-title">${esc(title)}</h2></div>${note ? `<p class="section-note">${esc(note)}</p>` : ''}</div>${body}</section>`;
+    }
+
+    function factsCards(c) {
+      const k = c.cartoes || {}, ex = k.experimento || {};
+      const cards = [['A promessa teórica', k.promessa_teorica, ''], ['Onde brilha', k.onde_brilha, ''], ['Onde morre na praia', k.onde_morre_na_praia, ''], ['Experimento pessoal', ex.convite, ex.metrica]];
+      return `<div class="four-cards">${cards.map((v, i) => `<article class="evidence-card ${i === 3 ? 'is-dark' : ''}"><div class="evidence-label">${['✦', '↗', '△', '◷'][i]} ${esc(v[0])}</div><p class="evidence-body">${esc(v[1] || '')}</p>${v[2] ? `<small>${esc(v[2])}</small>` : ''}</article>`).join('')}</div><div class="verdict"><strong>Veredito do praticante:</strong> ${esc(c.veredito_do_praticante || '')} </div>`;
+    }
+
+    function appGuide(a) {
+      const g = a.guia_de_aplicacao || {};
+      const pre = g.preparacao || {};
+      const evalData = g.avaliacao || {};
+      const decisions = evalData.criterios_de_decisao || {};
+      return `<div class="long-guide">${g.pergunta_a_testar ? `<p class="guide-question">${esc(g.pergunta_a_testar)}</p>` : ''}<h4>Antes de começar</h4>${[['Competência a observar', g.competencia_observavel], ['Materiais', pre.materiais], ['Conjuntos de avaliação', pre.conjuntos], ['Tempo e custo', pre.tempo_e_custo], ['Controle de qualidade', pre.controle_de_qualidade]].filter(([a, b]) => b).map(([a, b]) => `<p class="edition-warning"><strong>${esc(a)}.</strong> ${esc(b)}</p>`).join('')}<h4>Roteiro completo</h4><ol class="guide-timeline">${arr(g.roteiro).map(step => `<li><span class="step-index">${nfmt(step.etapa || 0)}</span><strong>${esc(step.nome)}</strong><p>${esc(step.instrucao)}</p><small>${esc(step.saida)}</small></li>`).join('')}</ol><h4>Avaliação independente</h4>${p(evalData.tarefa_inedita)}${evalData.momento_sugerido ? `<p class="edition-warning"><strong>Quando reavaliar:</strong> ${esc(evalData.momento_sugerido)}</p>` : ''}<div class="tagstrip">${arr(evalData.indicadores).map(x => `<span>${esc(x)}</span>`).join('')}</div>${Object.keys(decisions).length ? `<h4>Como decidir</h4>${Object.entries(decisions).map(([k, v]) => `<p class="edition-warning"><strong>${esc(k.replaceAll('_', ' '))}:</strong> ${esc(v)}</p>`).join('')}` : ''}${g.o_que_nao_inferir ? `<p class="edition-warning"><strong>Limite da conclusão:</strong> ${esc(g.o_que_nao_inferir)}</p>` : ''}${g.seguranca ? `<p class="edition-warning"><strong>Segurança:</strong> ${esc(g.seguranca)}</p>` : ''}</div>`;
+    }
+
+    function domain(a, title, number) {
+      return `<article class="domain-card"><div class="domain-top"><span class="domain-type">${esc(title)}</span><span class="domain-no">${number}</span></div><h3>${esc(a.cenario || title)}</h3><ol>${arr(a.passos).map(x => `<li>${esc(x)}</li>`).join('')}</ol><div class="domain-outcome"><strong>O que observar:</strong> ${esc(a.entrega_observavel)}</div><details><summary class="action-toggle">Abrir guia de aplicação e avaliação</summary>${appGuide(a)}</details></article>`;
+    }
+
+    function exampleSwitch(examples, id) {
+      const selected = examples.some(example => example.area === state.exampleArea) ? state.exampleArea : examples[0]?.area;
+      return `<div class="example-switch"><div class="example-toggle" role="group" aria-label="Área do exemplo">${examples.map(example => `<button type="button" data-example-area="${esc(example.area)}" aria-pressed="${example.area === selected}" aria-controls="${esc(id)}-${esc(example.area)}">${esc(example.title)}</button>`).join('')}</div>${examples.map(example => `<div class="example-panel" id="${esc(id)}-${esc(example.area)}" data-example-panel="${esc(example.area)}" role="region" aria-label="Exemplo em ${esc(example.title)}" ${example.area === selected ? '' : 'hidden'}>${example.content}</div>`).join('')}</div>`;
+    }
+
+    function attachExampleSwitches() {
+      document.querySelectorAll('.example-switch').forEach(group => {
+        group.querySelectorAll('[data-example-area]').forEach(button => {
+          button.addEventListener('click', () => {
+            state.exampleArea = button.dataset.exampleArea;
+            group.querySelectorAll('[data-example-area]').forEach(option => {
+              option.setAttribute('aria-pressed', String(option.dataset.exampleArea === state.exampleArea));
+            });
+            group.querySelectorAll('[data-example-panel]').forEach(panel => {
+              panel.hidden = panel.dataset.examplePanel !== state.exampleArea;
+            });
+            updateProgress();
+          });
+        });
+      });
+    }
+
+    function renderRefs(c) {
+      const all = arr(DATA.bibliografia);
+      const refs = arr(c.referencias_ids).map(id => all.find(x => x.id === id)).filter(Boolean);
+      if (!refs.length) return '<p>Não há referência associada a este capítulo no JSON.</p>';
+      return `<ul class="ref-list">${refs.map(r => {
+        const publication = String(r.publicacao || r.tipo || '').trim();
+        const description = publication && !/[.!?]$/.test(publication) ? `${publication}.` : publication;
+        return `<li><div class="ref-year">${esc(r.ano)}</div><div><strong>${esc(r.autores)}. ${esc(r.titulo_original)}.</strong><span>${esc(description)}</span>${r.doi ? `<div><span>DOI: ${esc(r.doi)}</span></div>` : ''}${r.url ? ` <a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">Abrir referência ↗</a>` : ''}</div></li>`;
+      }).join('')}</ul>`;
+    }
+
+    function renderChapter(c) {
+      const n = c.narrativa || {}, d = n.secao_descoberta || {};
+      const e = c.evidencia || {};
+      const ev = c.avaliacao || {};
+      const exp = c.experimento_de_uma_pagina || {};
+      const dependencies = arr(c.arvore?.dependencias_conceituais).map(id => chapters().find(x => x.id === id)).filter(Boolean);
+      const short = c.cabecalho?.descricao_curta || c.indice?.pilula || '';
+      return `${makeHeader('capitulo')}<main class="page chapter-shell">${hero(c.titulo, c.cabecalho?.sobretitulo || c.eixo, nfmt(c.ordem), short)}<div class="story-main"><div class="lead-intro"><div class="side-label">${esc(n.rotulo_abertura || 'A IDEIA EM UMA PÁGINA')}</div><p>${esc(n.abertura || short)}</p></div>
+      ${section(d.titulo || 'O que mudou na nossa compreensão', d.rotulo || '01 — A DESCOBERTA', `<div class="story-copy">${arr(d.paragrafos).map(p).join('')}</div>`, d.nota_de_contexto || '')}
+      ${section('A ideia, em quatro perspectivas', '02 — O QUE A EVIDÊNCIA SUGERE', factsCards(c), 'O benefício depende do material, do contexto e de como a técnica é aplicada.')}
+      ${section('Leve a ideia para a prática', '03 — LABORATÓRIO PESSOAL', `${exampleSwitch([{ area: 'computacao', title: 'Computação', content: domain(c.aplicacoes?.computacao || {}, 'Computação', '01') }, { area: 'medicina', title: 'Medicina', content: domain(c.aplicacoes?.medicina || {}, 'Medicina', '02') }], 'chapter-example')}<p class="critical-foot">${esc(n.ponte_para_a_pratica || 'Exemplos para testar, não receitas de eficácia garantida.')}</p>`, 'Escolha uma área e expanda o guia para ver o protocolo completo.')}
+      ${section('O que medir — e quando mudar', '04 — AVALIAÇÃO', `<div class="evaluation-items"><article><h3>Indicador principal</h3><p>${esc(ev.metrica_primaria || '')}</p></article><article><h3>Comparação</h3><p>${esc(ev.como_comparar || '')}</p></article><article><h3>Decisão</h3><p>${esc(ev.ajustar_ou_abandonar || '')}</p></article></div>${ev.evitar_confundidores ? `<p class="critical-foot"><strong>Evite confundir:</strong> ${esc(ev.evitar_confundidores)}</p>` : ''}`)}
+      ${section('O experimento em uma página', '05 — UMA HIPÓTESE, UM TESTE', `<div class="rubric">${[['Hipótese', exp.hipotese], ['O que mudar', exp.o_que_mudar], ['Como medir', exp.como_medirei], ['Como evitar o autoengano', exp.como_evitar_autoengano], ['Se não ajudar', exp.o_que_farei_se_nao_ajudar], ['O que a evidência não garante', n.limite_da_inferencia]].filter(([_, v]) => v).map(([k, v]) => `<article><b>${esc(k)}</b><p>${esc(v)}</p></article>`).join('')}</div>`)}
+      ${section('O alcance da evidência', '06 — LEITURA CRÍTICA', `<div class="summary-pair"><div><h3>O que foi estudado</h3>${p(e.escopo_que_foi_estudado)}</div><div><h3>O que permanece incerto</h3>${p(e.reserva)}</div></div><div class="mini-context"><strong>${esc(e.grau_editorial || 'Evidência contextual')}</strong><span>Classificação editorial, não índice estatístico universal.</span></div>${dependencies.length ? `<div class="tagstrip">${dependencies.map(dep => `<a class="subtle-link" href="#/capitulo/${encodeURIComponent(dep.id)}">${esc(dep.titulo)} ↗</a>`).join('')}</div>` : ''}`)}
+      ${section('Fontes e trabalhos originais', '07 — BIBLIOGRAFIA', renderRefs(c), 'Consulte o estudo para avaliar métodos, participantes, resultados e limites.')}
+      ${footerNav(c.id)}</div></main>`;
+    }
+
+    function renderPrelim() {
+      const prelim = DATA.capitulo_preliminar || {}, head = prelim.cabecalho || {}, opening = prelim.abertura || {};
+      let sections = arr(prelim.secoes).map(sectionData => {
+        let content = '';
+        if (sectionData.itens) content = `<div class="prelim-list">${arr(sectionData.itens).map(x => `<article class="prelim-box"><b>${esc(x.numero)}</b><h3>${esc(x.titulo)}</h3><p>${esc(x.texto)}</p></article>`).join('')}</div>`;
+        if (sectionData.etapas) content = `<div class="howto">${arr(sectionData.etapas).map(x => `<article class="howto-step"><span class="howto-number">${esc(x.numero)}</span><h3>${esc(x.titulo)}</h3><p>${esc(x.texto)}</p></article>`).join('')}</div>`;
+        if (sectionData.momentos) content = `<div class="measure-grid">${arr(sectionData.momentos).map(x => `<article><h3>${esc(x.titulo)}</h3><p>${esc(x.texto)}</p></article>`).join('')}</div>${sectionData.aviso ? `<p class="critical-foot">${esc(sectionData.aviso)}</p>` : ''}`;
+        if (sectionData.areas) content = exampleSwitch(arr(sectionData.areas).map((a, i) => ({
+          area: a.area,
+          title: a.area === 'computacao' ? 'Computação' : a.area === 'medicina' ? 'Medicina' : a.area,
+          content: `<article class="domain-card"><div class="domain-top"><span class="domain-type">${a.area === 'computacao' ? 'Computação' : a.area === 'medicina' ? 'Medicina' : esc(a.area)}</span><span class="domain-no">0${i + 1}</span></div><h3>${esc(a.titulo)}</h3><ol>${arr(a.passos).map(x => `<li>${esc(x)}</li>`).join('')}</ol><div class="domain-outcome"><strong>Como verificar:</strong> ${esc(a.evidencia_observavel)}</div></article>`
+        })), `opening-${sectionData.id}`);
+        if (sectionData.epigrafe) content = `<div class="statute"><small>O princípio editorial</small><blockquote>${esc(sectionData.epigrafe)}</blockquote><p>${esc(sectionData.comentario || '')}</p></div>`;
+        return section(sectionData.titulo, sectionData.rotulo, content, sectionData.nota || '');
+      }).join('');
+      const protocol = prelim.registro_minimo_de_experimento || {};
+      sections += section('Seu registro mínimo', '06 — DOCUMENTE PARA DECIDIR', `<div class="check-cols">${[['Antes', protocol.antes], ['Durante', protocol.durante], ['Depois', protocol.depois]].map(([title, questions]) => `<div class="check-col"><h3>${title}</h3>${items(questions)}</div>`).join('')}</div><p class="critical-foot">${esc(prelim.nota_metodologica)}</p>`);
+      return `${makeHeader('preliminar')}<main class="page chapter-shell">${hero(head.titulo_destaque || prelim.titulo, head.sobretitulo || 'PRELIMINAR', '00', prelim.indice?.pilula || '', true)}<div class="story-main"><div class="lead-intro"><div class="side-label">${esc(opening.rotulo || 'O PROPÓSITO')}</div><div class="opening-copy">${p(opening.texto)}${p(opening.nota_ao_leitor)}</div></div>${sections}${footerNav('preliminar')}</div></main>`;
+    }
+
+    function renderConclusion() {
+      const c = DATA.conclusao || {};
+      const r = c.regra_de_decisao || {};
+      return `${makeHeader('conclusao')}<main class="page chapter-shell">${hero('Conclusão', 'O que permanece', '—', c.tese || '')}<div class="story-main"><div class="lead-intro"><span class="side-label">O CRITÉRIO FINAL</span><p>${esc(c.paradoxo_final)}</p></div>${section('Da evidência à escolha', '01 — REGRAS DE DECISÃO', `<div class="rubric">${Object.entries(r).map(([k, v]) => `<article><b>${esc(k[0].toUpperCase() + k.slice(1))}</b><p>${esc(v)}</p></article>`).join('')}</div>`)}${section('O que levar para a próxima experiência', '02 — PRINCÍPIOS OPERACIONAIS', `<div class="prelim-list">${arr(c.principios_operacionais).map((x, i) => `<article class="prelim-box"><b>${nfmt(i + 1)}</b><p>${esc(x)}</p></article>`).join('')}</div>`)}<div class="end-cover"><h2>${esc(c.titulo)}</h2><p>${esc(c.convite)}</p><a href="#/indice" class="thin-link">Voltar ao índice →</a></div>${footerNav('conclusao')}</div></main>`;
+    }
+
+    function renderAtlas() {
+      const nodes = arr(DATA.atlas_semantico?.nos);
+      return `${makeHeader('atlas')}<main class="page index-wrap"><div class="index-intro"><div><div class="index-eyebrow">Visão complementar · ordem semântica</div><h1>Atlas</h1></div><p>${esc(DATA.atlas_semantico?.orientacao_visual || 'Dependências e profundidade conceitual.')}</p></div><div class="lead-intro" style="padding:40px 0 65px"><div class="side-label">OUTRA FORMA DE LER</div><p>O índice organiza a narrativa no tempo. Este atlas ajuda a reconhecer fundamentos e relações entre ideias. Não confunda posição na árvore com validade científica.</p></div>${['raiz', 'tronco', 'ramos', 'folhas'].map((depth, i) => { let here = nodes.filter(n => n.profundidade === depth); return section(["Raízes · fundamentos", "Tronco · estrutura", "Ramos · desdobramentos", "Folhas · contextos e especializações"][i], `CAMADA 0${i + 1}`, `<div class="atlas-grid">${here.map(n => `<a href="#/capitulo/${encodeURIComponent(n.id)}" class="atlas-node"><small>${esc(n.ano)} · ${esc(n.eixo)}</small><strong>${esc(n.rotulo)}</strong></a>`).join('')}</div>`); }).join('')}<p class="footer-quiet">${esc(DATA.atlas_semantico?.tipo || 'Relações editoriais interpretativas.')}</p></main>`;
+    }
+
+    function renderFileHelp(reason = '') {
+      return `<header class="header header-with-donation"><div class="header-identity"><a class="brand" href="#/capa">Cognitio</a>${renderDonation()}</div></header><main class="page file-loader"><h1>Abra o livro</h1><p>O leitor carrega seus capítulos diretamente do arquivo JSON, sem copiá-los para o HTML.</p><p><strong>Para abrir com duplo clique:</strong> selecione o arquivo <code>cognitio_capitulos_edicao_pratica.json</code> que está nesta pasta. Isso contorna a restrição de acesso a arquivos locais de alguns navegadores.</p><label class="file-picker" tabindex="0">Selecionar JSON <input id="json-picker" type="file" accept=".json,application/json"></label><p>Ou abra esta pasta com um servidor local: <code>python3 -m http.server 8000</code> e visite <code>http://localhost:8000</code>. Nesse modo, o carregamento é automático.</p>${reason ? `<p role="alert" style="color:var(--rust)">${esc(reason)}</p>` : ''}</main>`;
+    }
+
+    function activeRoute() {
+        if (!DATA) { el('app').innerHTML = renderFileHelp(); attachFilePicker(); return; }
+        
+        const requestedRoute = decodeURIComponent(location.hash.replace(/^#/, ''));
+        const hash = !requestedRoute || requestedRoute === '/' ? '/capa' : requestedRoute;
+        
+        let html = '';
+        if (hash === '/capa') html = renderCover();
+        else if (hash === '/indice') html = renderIndex();
+        else if (hash === '/preliminar') html = renderPrelim();
+        else if (hash === '/conclusao') html = renderConclusion();
+        else if (hash === '/atlas') html = renderAtlas();
+        else if (hash.startsWith('/capitulo/')) { 
+            const slug = hash.slice('/capitulo/'.length); 
+            const found = chapters().find(c => c.id === slug || c.url_slug === slug); 
+            html = found ? renderChapter(found) : renderNotFound(); 
+        }
+        else html = renderNotFound();
+        
+        el('app').innerHTML = html;
+        if (hash === '/indice') attachIndexControls();
+        attachExampleSwitches();
+        
+        document.title = (hash === '/indice' ? 'Índice' : hash === '/preliminar' ? 'Antes de começar' : hash === '/capa' ? 'Cognitio' : hash === '/conclusao' ? 'Conclusão' : chapters().find(c => hash.includes(c.id))?.titulo || 'Cognitio') + ' — Cognitio';
+        window.scrollTo({ top: 0, behavior: 'instant' }); 
+        updateProgress();
+    }
+
+    function renderNotFound() { return `${makeHeader()}<main class="file-loader"><h1>Capítulo não encontrado</h1><p>O endereço não corresponde a uma entrada do JSON.</p><a class="thin-link" href="#/indice">Voltar ao índice →</a></main>`; }
+
+    function attachIndexControls() {
+      el('search')?.addEventListener('input', e => { state.query = e.target.value; refreshResults(); });
+      el('phase')?.addEventListener('change', e => { state.phase = e.target.value; refreshResults(); });
+      el('essential')?.addEventListener('click', () => { state.onlyEssential = !state.onlyEssential; el('essential').setAttribute('aria-checked', String(state.onlyEssential)); refreshResults(); });
+    }
+
+    function resultCount(visible, total) {
+      const filtered = state.query.trim() || state.onlyEssential || state.phase !== 'todas';
+      return filtered ? `${visible} de ${total} capítulos` : `${total} ${total === 1 ? 'capítulo' : 'capítulos'}`;
+    }
+
+    function refreshResults() {
+      const c = chapters(), q = state.query.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const chosen = c.filter(x => {
+        if (state.onlyEssential && x.prioridade_editorial !== 'essencial') return false;
+        if (state.phase !== 'todas' && !DATA.fases.find(f => f.id === state.phase)?.capitulos.includes(x.id)) return false;
+        const flat = [x.titulo, x.eixo, x.ano_marco, x.indice?.pilula, ...arr(x.referencias_ids)].join(' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); return !q || flat.includes(q);
+      });
+      const groups = arr(DATA.fases).map(f => ({ ...f, found: chosen.filter(x => arr(f.capitulos).includes(x.id)) })).filter(f => f.found.length);
+      el('index-results').innerHTML = renderIndexGroups(groups);
+      el('count').textContent = resultCount(chosen.length, c.length);
+      updateProgress();
+    }
+
+    function attachFilePicker() { el('json-picker')?.addEventListener('change', async (e) => { const f = e.target.files?.[0]; if (!f) return; try { const obj = JSON.parse(await f.text()); validate(obj); DATA = obj; activeRoute(); } catch (err) { el('app').innerHTML = renderFileHelp('Não foi possível ler o JSON: ' + err.message); attachFilePicker(); } }); }
+    function validate(obj) { if (!obj || !Array.isArray(obj.capitulos) || !obj.capitulos.length || !obj.capitulo_preliminar || !Array.isArray(obj.bibliografia)) throw Error('Estrutura inesperada: faltam capítulos, preliminar ou bibliografia.'); }
+    function updateProgress() { const bar = el('progress'); if (!bar) return; const doc = document.documentElement; const scrollable = Math.max(1, doc.scrollHeight - innerHeight); bar.style.width = `${Math.min(100, Math.max(0, scrollY / scrollable * 100))}%`; }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    window.addEventListener('hashchange', activeRoute);
+
+    (async () => {
+      try {
+        const res = await fetch(JSON_URL, { cache: 'no-store' });
+        if (!res.ok) throw Error('HTTP ' + res.status);
+        const obj = await res.json();
+        validate(obj);
+        DATA = obj;
+        activeRoute();
+      } catch (err) {
+        el('app').innerHTML = renderFileHelp(location.protocol === 'file:' ? 'Seu navegador bloqueou a leitura automática de arquivos locais.' : 'Arquivo JSON não encontrado. ' + err.message);
+        attachFilePicker();
+      }
+    })();
+  </script>
+</body>
+</html>
