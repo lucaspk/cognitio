@@ -19,6 +19,7 @@
   },
   "apresentacao": {
     "titulo": "Cognitio — aprender é transformar desempenho em conhecimento durável",
+    "resumo_capa": "Conheça técnicas de aprendizagem e teste-as com exercícios de computação e medicina. Em cada capítulo, veja como experimentar uma técnica, o que observar e quais são seus limites. Não há promessa de que funcione igual para todo mundo.",
     "resumo": "Uma história experimental da aprendizagem: de medir o esquecimento a construir habilidades e decidir quais métodos merecem continuar. O livro apresenta os trabalhos que alteraram o campo, suas promessas, evidências, limitações e testes concretos em computação e medicina. A cobertura contemporânea inclui replicações, metanálises por domínio, personalização e efeitos positivos e negativos de tutores de IA (2020–2026).",
     "pergunta_central": "Como saber se um método realmente melhorou o que consigo lembrar, explicar, executar e transferir para problemas novos?",
     "perguntas_guia": [

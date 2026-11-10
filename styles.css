@@ -135,7 +135,13 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-o
   font-size: 13px;
   line-height: 1.7;
 }
-.cover .site-donation { margin: 0 0 1.75rem .65rem; }
+.cover-summary {
+  max-width: 48ch;
+  margin: 0 0 1.75rem .65rem;
+  color: #766757;
+  font-size: clamp(14px, 1.1vw, 17px);
+  line-height: 1.7;
+}
 .site-donation a {
   text-decoration: underline;
   text-decoration-color: rgb(118 103 87 / 45%);
@@ -1090,7 +1096,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-o
     margin-bottom: 1.25rem;
     font-size: clamp(3.5rem, 17vw, 7rem);
   }
-  .cover .site-donation { margin-inline: auto; }
+  .cover-summary { margin-inline: auto; }
   .cover .thin-link { margin-left: 0; font-size: clamp(1.2rem, 4.5vw, 1.5rem); }
 }
 

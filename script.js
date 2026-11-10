@@ -45,7 +45,7 @@ function footerNav(current) {
 }
 
 function renderCover() {
-  return `<main class="page cover" aria-labelledby="book-title"><img src="${TREE}" alt="Ilustração de uma árvore antiga com raízes expostas" class="cover-tree" width="1254" height="1254" fetchpriority="high"><div class="cover-copy"><h1 class="cover-title" id="book-title">Cognitio</h1>${renderDonation()}<a class="thin-link" href="#/indice"><span>Acessar o livro</span><svg viewBox="0 0 32 20" aria-hidden="true"><path d="M1 10h26M19 2l8 8-8 8" /></svg></a></div></main>`;
+  return `<main class="page cover" aria-labelledby="book-title"><img src="${TREE}" alt="Ilustração de uma árvore antiga com raízes expostas" class="cover-tree" width="1254" height="1254" fetchpriority="high"><div class="cover-copy"><h1 class="cover-title" id="book-title">Cognitio</h1><p class="cover-summary">${esc(DATA.apresentacao?.resumo_capa || '')}</p><a class="thin-link" href="#/indice"><span>Acessar o livro</span><svg viewBox="0 0 32 20" aria-hidden="true"><path d="M1 10h26M19 2l8 8-8 8" /></svg></a></div></main>`;
 }
 
 function card(c, index, featured = false) {
